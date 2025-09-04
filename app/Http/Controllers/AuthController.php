@@ -15,6 +15,9 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'satker' => 'required|string',
+            'nip' => 'required|string|max:18|unique:users',
+            'no_telp' => 'required|string|max:20',
             'password' => 'required|string|min:6',
         ]);
 
@@ -22,6 +25,9 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'satker' => $request->satker,
+            'nip' => $request->nip,
+            'no_telp' => $request->no_telp,
             'password' => Hash::make($request->password), // password di-hash
         ]);
 
@@ -33,19 +39,37 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'nip' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+        if (!Auth::attempt($request->only('nip', 'password'))) {
             return response()->json([
-                'message' => 'Login berhasil',
-                'user' => $user,
-            ]);
+                'message' => 'NIP atau password salah'
+            ], 401);
         }
 
+        $user = Auth::user();
+
+        // bikin token Sanctum
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
-            'message' => 'Email atau password salah'
-        ], 401);
+            'message' => 'Login berhasil',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $user,
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout berhasil'
+        ]);
     }
 
 }
