@@ -40,7 +40,7 @@ class UserController extends Controller
             'satker' => 'string',
             'nip' => 'string|max:18|unique:users,nip,' . $id,
             'no_telp' => 'string|max:20',
-            'password' => 'string|min:6',
+            'password' => 'nullable|string|min:6',
         ]);
 
         $user->update([
