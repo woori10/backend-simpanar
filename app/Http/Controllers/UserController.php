@@ -8,6 +8,28 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        $users = User::all();
+        return response()->json([
+            'message' => 'Daftar semua user',
+            'users' => $users
+        ]);
+    }
+
+    public function show($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'message' => 'Detail user',
+            'user' => $user
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
