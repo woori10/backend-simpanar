@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TataKerjaController;
 use App\Http\Controllers\MateriDiklatController;
+use App\Http\Controllers\DaftarAlatController;
 
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -35,4 +36,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/materi-diklat', [MateriDiklatController::class, 'store']);
     Route::put('/materi-diklat/{id}', [MateriDiklatController::class, 'update']);
     Route::delete('/materi-diklat/{id}', [MateriDiklatController::class, 'destroy']);
+
+    Route::post('/daftar-alat', [DaftarAlatController::class, 'store']);
+    Route::get('/daftar-alat', [DaftarAlatController::class, 'index']);
+    Route::get('/daftar-alat/{id}', [DaftarAlatController::class, 'show']);
+    Route::put('/daftar-alat/{id}', [DaftarAlatController::class, 'update']);
+    Route::delete('/daftar-alat/{id}', [DaftarAlatController::class, 'destroy']);
 });
