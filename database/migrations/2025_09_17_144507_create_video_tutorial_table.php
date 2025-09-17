@@ -9,14 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('video_tutorial', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('id_daftar_alat')->constrained('daftar_alat')->onDelete('cascade');
-        $table->string('video');
-        $table->timestamps();
-});
+            $table->id();
+            $table->foreignId('daftar_alat_id')
+                ->constrained('daftar_alat')
+                ->onDelete('cascade');
+            $table->string('file_video'); // path video
+            $table->timestamps();
+        });
     }
 
     /**

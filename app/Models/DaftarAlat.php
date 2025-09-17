@@ -14,4 +14,9 @@ class DaftarAlat extends Model
     {
         return $this->hasMany(MateriDiklat::class);
     }
+
+    public function videoTutorial()
+    {
+        return $this->hasMany(VideoTutorial::class);
+    }
 }

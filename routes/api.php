@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TataKerjaController;
 use App\Http\Controllers\MateriDiklatController;
 use App\Http\Controllers\DaftarAlatController;
+use App\Http\Controllers\VideoTutorialController;
 
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -42,4 +43,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/daftar-alat/{id}', [DaftarAlatController::class, 'show']);
     Route::put('/daftar-alat/{id}', [DaftarAlatController::class, 'update']);
     Route::delete('/daftar-alat/{id}', [DaftarAlatController::class, 'destroy']);
+
+    Route::get('/video-tutorial', [VideoTutorialController::class, 'index']);
+    Route::get('/video-tutorial/{id}', [VideoTutorialController::class, 'show']);
+    Route::post('/video-tutorial', [VideoTutorialController::class, 'store']);
+    Route::put('/video-tutorial/{id}', [VideoTutorialController::class, 'update']);
+    Route::delete('/video-tutorial/{id}', [VideoTutorialController::class, 'destroy']);
+    Route::get('/video-tutorial/alat/{daftar_alat_id}', [VideoTutorialController::class, 'listByAlat']);
 });
