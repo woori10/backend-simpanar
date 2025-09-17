@@ -12,9 +12,14 @@ class MateriDiklat extends Model
     protected $table = 'materi_diklat';
 
     protected $fillable = [
-        'nama',
+        'daftar_alat_id',
+        'nama_alat',
         'foto',
-        'dokumen',
+        'file_pdf'
     ];
 
+    public function daftarAlat() {
+        // return $this->belongsTo(DaftarAlat::class, 'daftar_alat_id');
+        return $this->belongsTo(DaftarAlat::class);
+    }
 }

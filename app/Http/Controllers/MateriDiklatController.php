@@ -10,65 +10,62 @@ class MateriDiklatController extends Controller
 {
     public function store(Request $request)
     {
-        $request->validate([
-            'nama'=> 'required|string|max:255',
-            'foto'=> 'required|image|mimes:jpg,jpeg,png|max:2048',
-            'dokumen'=> 'required|mimes:pdf|max:102400',
-        ], [
-            'nama.required' => 'Nama harus diisi.',
-            'nama.string'   => 'Nama harus berupa teks.',
-            'nama.max'      => 'Nama maksimal 255 karakter.',
-
-            'foto.required' => 'Foto wajib diunggah.',
-            'foto.image'    => 'File foto harus berupa gambar.',
-            'foto.mimes'    => 'Format foto harus jpg, jpeg, atau png.',
-            'foto.max'      => 'Ukuran foto maksimal 2 MB.',
-
-            'dokumen.required' => 'Dokumen wajib diunggah.',
-            'dokumen.mimes'    => 'Dokumen hanya boleh berupa file PDF.',
-            'dokumen.max'      => 'Ukuran file maksimal 100 MB.',
+        // Validasi input
+        $validated = $request->validate([
+            'daftar_alat_id' => 'required|exists:daftar_alat,id',
+            'file_pdf'       => 'required|mimes:pdf|max:102400',
         ]);
 
-        $fotoPath = $request->file('foto')->store('foto', 'public');
-        $dokumenPath = $request->file('dokumen')->store('dokumen', 'public');
+        // Simpan file PDF ke storage/public/file_pdf
+        $filePDFPath = $request->file('file_pdf')->store('file_pdf', 'public');
 
+        // Ambil data nama_alat dan foto dari tabel daftar_alat
+        $alat = \App\Models\DaftarAlat::findOrFail($validated['daftar_alat_id']);
+
+        // Simpan ke tabel materi_diklat termasuk nama_alat & foto
         $materi_diklat = MateriDiklat::create([
-            'nama' => $request->nama,
-            'foto' => $fotoPath,
-            'dokumen' => $dokumenPath,
+            'daftar_alat_id' => $alat->id,
+            'nama_alat'      => $alat->nama_alat,
+            'foto'           => $alat->foto,
+            'file_pdf'       => $filePDFPath,
         ]);
+
+        // // Jika masih ingin relasi daftarAlat ikut diload
+        // $materi_diklat->load('daftarAlat');
 
         return response()->json([
             'message' => 'Materi Diklat Berhasil Ditambahkan',
-            'data' => $materi_diklat
-
+            'data'    => $materi_diklat
         ]);
     }
 
+
     public function index()
     {
-        $materi_diklat = MateriDiklat::all()->map(function ($item) {
-            return[
-                'id' => $item->id,
-                'nama' => $item->nama,
-                'foto_url' => asset('storage/'. $item->foto),
-                'dokumen_url' => asset('storage/'. $item->dokumen),
-            ];
-        });
+        return MateriDiklat::with('daftarAlat')->get();
+        // $materi_diklat = MateriDiklat::all()->map(function ($item) {
+        //     return[
+        //         'id' => $item->id,
+        //         'nama' => $item->nama,
+        //         'foto_url' => asset('storage/'. $item->foto),
+        //         'dokumen_url' => asset('storage/'. $item->dokumen),
+        //     ];
+        // });
 
-        return response()->json($materi_diklat);
+        // return response()->json($materi_diklat);
     }
 
     public function show($id)
     {
-        $materi_diklat = MateriDiklat::findOrFail($id);
+        return MateriDiklat::with('daftarAlat')->findOrFail($id);
+        // $materi_diklat = MateriDiklat::findOrFail($id);
 
-        return response()->json([
-            'id' => $materi_diklat->id,
-            'nama' => $materi_diklat->nama,
-            'foto_url' => asset('storage/' . $materi_diklat->foto),
-            'dokumen_url' => asset('storage/' . $materi_diklat->dokumen),
-        ]);
+        // return response()->json([
+        //     'id' => $materi_diklat->id,
+        //     'nama' => $materi_diklat->nama,
+        //     'foto_url' => asset('storage/' . $materi_diklat->foto),
+        //     'dokumen_url' => asset('storage/' . $materi_diklat->dokumen),
+        // ]);
     }
 
     public function update (Request $request, $id)
@@ -76,24 +73,14 @@ class MateriDiklatController extends Controller
         $materi_diklat = MateriDiklat::findOrFail($id);
 
         $request->validate([
-            'nama'=> 'string|max:255',
-            'foto'=> 'image|mimes:jpg,jpeg,png|max:2048',
-            'dokumen'=> 'mimes:pdf|max:102400',
+            'daftar_alat_id' => 'sometimes|exists:daftar_alat,id',
+            'file_pdf'=> 'mimes:pdf|max:102400',
         ]);
 
-        // update kolom teks
-        $materi_diklat->nama = $request->nama ?? $materi_diklat->nama;
-
-        // update file foto bila ada
-        if ($request->hasFile('foto')) {
-            Storage::disk('public')->delete($materi_diklat->foto);
-            $materi_diklat->foto = $request->file('foto')->store('foto', 'public');
-        }
-
         // update dokumen bila ada
-        if ($request->hasFile('dokumen')) {
-            Storage::disk('public')->delete($materi_diklat->dokumen);
-            $materi_diklat->dokumen = $request->file('dokumen')->store('dokumen', 'public');
+        if ($request->hasFile('file_pdf')) {
+            Storage::disk('public')->delete($materi_diklat->file_pdf);
+            $materi_diklat->file_pdf = $request->file('file_pdf')->store('file_pdf', 'public');
         }
 
         $materi_diklat->save();
@@ -108,10 +95,6 @@ class MateriDiklatController extends Controller
     public function destroy($id)
     {
         $materi_diklat = MateriDiklat::findOrFail($id);
-
-        Storage::disk('public')->delete($materi_diklat->foto);
-        Storage::disk('public')->delete($materi_diklat->dokumen);
-
         $materi_diklat->delete();
 
         return response()->json([

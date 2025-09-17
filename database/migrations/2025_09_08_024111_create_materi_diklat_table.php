@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('materi_diklat', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->string('foto');
-            $table->string('dokumen');
+            $table->foreignId('daftar_alat_id')
+                  ->constrained('daftar_alat')
+                  ->onDelete('cascade');     // jika alat dihapus, materi ikut terhapus
+            $table->string('file_pdf')->nullable(); // path file PDF materi
             $table->timestamps();
         });
     }

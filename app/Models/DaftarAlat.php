@@ -9,4 +9,9 @@ class DaftarAlat extends Model
 {
     protected $table = 'daftar_alat';
     protected $fillable = ['nama_alat','foto'];
+
+    public function materiDiklat()
+    {
+        return $this->hasMany(MateriDiklat::class);
+    }
 }
