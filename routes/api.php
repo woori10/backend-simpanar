@@ -8,6 +8,8 @@ use App\Http\Controllers\TataKerjaController;
 use App\Http\Controllers\MateriDiklatController;
 use App\Http\Controllers\DaftarAlatController;
 use App\Http\Controllers\VideoTutorialController;
+use App\Http\Controllers\FaqController;
+use App\Http\Controllers\KeluhanController;
 
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -44,10 +46,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/daftar-alat/{id}', [DaftarAlatController::class, 'update']);
     Route::delete('/daftar-alat/{id}', [DaftarAlatController::class, 'destroy']);
 
-    Route::get('/video-tutorial', [VideoTutorialController::class, 'index']);
-    Route::get('/video-tutorial/{id}', [VideoTutorialController::class, 'show']);
-    Route::post('/video-tutorial', [VideoTutorialController::class, 'store']);
-    Route::put('/video-tutorial/{id}', [VideoTutorialController::class, 'update']);
-    Route::delete('/video-tutorial/{id}', [VideoTutorialController::class, 'destroy']);
-    Route::get('/video-tutorial/alat/{daftar_alat_id}', [VideoTutorialController::class, 'listByAlat']);
+    Route::get('/faq', [FaqController::class, 'index']);
+    Route::get('/faq/{id}', [FaqController::class, 'show']);
+    Route::post('/faq', [FaqController::class, 'store']);
+    Route::put('/faq/{id}', [FaqController::class, 'update']);
+    Route::delete('/faq/{id}', [FaqController::class, 'destroy']);
+
+    Route::post('/keluhan', [KeluhanController::class, 'store']);
+    Route::get('/keluhan', [KeluhanController::class, 'index']);
+    Route::get('/keluhan/{id}', [KeluhanController::class, 'show']);
+    Route::delete('/keluhan/{id}', [KeluhanController::class, 'destroy']);
+
 });
